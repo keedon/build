@@ -197,6 +197,9 @@ func lexAny(l *Lexer) stateFn {
 			return lexAny
 		case r == '.':
 			return lexPeriodOrElipsis
+		case r == '+':
+			l.emit(token.Plus)
+			return lexAny
 		case r == ',':
 			l.ignore()
 			return lexAny

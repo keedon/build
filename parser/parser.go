@@ -105,11 +105,32 @@ func parseVar(p *Parser) stateFn {
 
 	switch p.peek().Type {
 	case token.LeftBrac:
-		p.Document.Vars[t.String()] = p.parseSlice()
-		return parseDecl
+		slc := p.parseSlice()
+		if p.peek().Type != token.Plus {
+			p.Document.Vars[t.String()] = slc
+			return parseDecl
+		} else if p.peek().Type == token.Plus {
+
+		}
 	case token.String:
 		p.Document.Vars[t.String()] = p.next()
 		return parseDecl
+	case token.Func:
+		f := &ast.Func{
+			Name: p.next().String(),
+		}
+		p.Document.Vars[t.String()] = f
+		// that func is a named param
+		f.Parent = nil
+
+		p.ptr = f
+
+		// parse the funkies
+		t := p.next()
+		if !p.isExpected(t, token.LeftParen) {
+			return nil
+		}
+		return parseParams
 	}
 
 	return nil
@@ -152,6 +173,7 @@ func parseFuncEnd(p *Parser) stateFn {
 		return parseParams
 	}
 }
+
 func parseParams(p *Parser) stateFn {
 
 	switch p.peek().Type {

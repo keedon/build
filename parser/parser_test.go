@@ -90,19 +90,20 @@ import (
 func TestPreProcessor(t *testing.T) {
 
 	var doc ast.File
-	ks, _ := os.Open("../tests/libxstring/BUILD")
+	ks, err := os.Open("../lexer/map.BUILD")
+	if err != nil {
+		t.Errorf("opening file: %s\n", err.Error())
+	}
 	ts, _ := filepath.Abs(ks.Name())
 	dir := strings.Split(ts, "/")
 	if err := New("BUILD", "/"+filepath.Join(dir[:len(dir)-1]...), ks).Decode(&doc); err != nil {
-		t.Error(err.Error())
+
 		if err != nil {
-			t.Error(err)
+			t.Errorf("decoding file: %s\n", err)
 		}
 
 	} else {
-		var p Processor
-
-		log.Printf(prettyprint.AsJSON(p.Process(&doc)))
+		log.Printf(prettyprint.AsJSON(&doc))
 	}
 
 }
